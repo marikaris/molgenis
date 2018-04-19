@@ -7,9 +7,9 @@
   "scripts": {
     "dev": "node build/dev-server.js",
     "build": "node build/build.js",
-    "test": "cross-env BABEL_ENV=test karma start test/unit/karma.conf.js --single-run",
-    "test:watch": "cross-env BABEL_ENV=test karma start test/unit/karma.conf.js --watch",
-    "test:debug": "cross-env BABEL_ENV=test karma start test/unit/karma.conf.js -i --watch",
+    "unit": "cross-env BABEL_ENV=test karma start test/unit/karma.conf.js --single-run",
+    "unit:watch": "cross-env BABEL_ENV=test karma start test/unit/karma.conf.js --watch",
+    "unit:debug": "cross-env BABEL_ENV=test karma start test/unit/karma.conf.js -i --watch",
     "lint": "eslint --ext .js,.vue src test/unit/specs",
     "lint:fix": "eslint --ext .js,.vue src test/unit/specs"
   },
@@ -22,7 +22,7 @@
     "font-awesome": "^4.7.0",
     "v-toaster": "^1.0.2",
     "vue": "^2.2.6",
-    "vue-multiselect": "next",
+    "vue-multiselect": "^2.1.0",
     "vue-router": "^2.3.1",
     "vue-sweetalert": "^0.1.17",
     "vuedraggable": "^2.14.1",

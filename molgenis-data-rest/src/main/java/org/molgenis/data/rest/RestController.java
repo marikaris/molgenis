@@ -19,7 +19,7 @@ import org.molgenis.data.support.DefaultEntityCollection;
 import org.molgenis.data.support.QueryImpl;
 import org.molgenis.data.validation.ConstraintViolation;
 import org.molgenis.data.validation.MolgenisValidationException;
-import org.molgenis.security.core.PermissionService;
+import org.molgenis.security.core.UserPermissionEvaluator;
 import org.molgenis.security.core.token.TokenService;
 import org.molgenis.security.core.token.UnknownTokenException;
 import org.molgenis.security.settings.AuthenticationSettings;
@@ -93,14 +93,15 @@ public class RestController
 	private final DataService dataService;
 	private final TokenService tokenService;
 	private final AuthenticationManager authenticationManager;
-	private final PermissionService permissionService;
+	private final UserPermissionEvaluator permissionService;
 	private final UserAccountService userAccountService;
 	private final MolgenisRSQL molgenisRSQL;
 	private final RestService restService;
 
 	public RestController(AuthenticationSettings authenticationSettings, DataService dataService,
-			TokenService tokenService, AuthenticationManager authenticationManager, PermissionService permissionService,
-			UserAccountService userAccountService, MolgenisRSQL molgenisRSQL, RestService restService)
+			TokenService tokenService, AuthenticationManager authenticationManager,
+			UserPermissionEvaluator permissionService, UserAccountService userAccountService, MolgenisRSQL molgenisRSQL,
+			RestService restService)
 	{
 		this.authenticationSettings = requireNonNull(authenticationSettings);
 		this.dataService = requireNonNull(dataService);
@@ -1073,7 +1074,7 @@ public class RestController
 		Query<Entity> q = new QueryImpl<>(queryRules).pageSize(request.getNum()).offset(request.getStart()).sort(sort);
 
 		Iterable<Entity> it = () -> dataService.findAll(entityTypeId, q).iterator();
-		Long count = repository.count(q);
+		Long count = repository.count(new QueryImpl<>(q).setOffset(0).setPageSize(0));
 		EntityPager pager = new EntityPager(request.getStart(), request.getNum(), count, it);
 
 		List<Map<String, Object>> entities = new ArrayList<>();

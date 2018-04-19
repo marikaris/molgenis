@@ -11,14 +11,15 @@ import org.molgenis.data.meta.model.EntityType;
 import org.molgenis.data.meta.model.Package;
 import org.molgenis.data.rest.EntityPager;
 import org.molgenis.data.rest.service.RestService;
+import org.molgenis.data.security.EntityTypeIdentity;
+import org.molgenis.data.security.EntityTypePermission;
 import org.molgenis.data.security.permission.PermissionSystemService;
 import org.molgenis.data.support.EntityTypeUtils;
 import org.molgenis.data.support.QueryImpl;
 import org.molgenis.data.support.RepositoryCopier;
 import org.molgenis.data.validation.meta.NameValidator;
 import org.molgenis.i18n.LanguageService;
-import org.molgenis.security.core.Permission;
-import org.molgenis.security.core.PermissionService;
+import org.molgenis.security.core.UserPermissionEvaluator;
 import org.molgenis.util.UnexpectedEnumException;
 import org.molgenis.web.ErrorMessageResponse;
 import org.molgenis.web.ErrorMessageResponse.ErrorMessage;
@@ -74,7 +75,7 @@ public class RestControllerV2
 
 	private final DataService dataService;
 	private final RestService restService;
-	private final PermissionService permissionService;
+	private final UserPermissionEvaluator permissionService;
 	private final PermissionSystemService permissionSystemService;
 	private final RepositoryCopier repoCopier;
 	private final LocalizationService localizationService;
@@ -122,7 +123,7 @@ public class RestControllerV2
 				"The entity you are trying to update [" + id.toString() + "] does not exist.");
 	}
 
-	public RestControllerV2(DataService dataService, PermissionService permissionService, RestService restService,
+	public RestControllerV2(DataService dataService, UserPermissionEvaluator permissionService, RestService restService,
 			LocalizationService localizationService, PermissionSystemService permissionSystemService,
 			RepositoryCopier repoCopier)
 	{
@@ -158,9 +159,10 @@ public class RestControllerV2
 	@GetMapping("/{entityTypeId}/{id:.+}")
 	public Map<String, Object> retrieveEntity(@PathVariable("entityTypeId") String entityTypeId,
 			@PathVariable("id") String untypedId,
-			@RequestParam(value = "attrs", required = false) AttributeFilter attributeFilter)
+			@RequestParam(value = "attrs", required = false) AttributeFilter attributeFilter,
+			@RequestParam(value = "includeCategories", defaultValue = "false") boolean includeCategories)
 	{
-		return getEntityResponse(entityTypeId, untypedId, attributeFilter);
+		return getEntityResponse(entityTypeId, untypedId, attributeFilter, includeCategories);
 	}
 
 	/**
@@ -169,13 +171,14 @@ public class RestControllerV2
 	@PostMapping(value = "/{entityTypeId}/{id:.+}", params = "_method=GET")
 	public Map<String, Object> retrieveEntityPost(@PathVariable("entityTypeId") String entityTypeId,
 			@PathVariable("id") String untypedId,
-			@RequestParam(value = "attrs", required = false) AttributeFilter attributeFilter)
+			@RequestParam(value = "attrs", required = false) AttributeFilter attributeFilter,
+			@RequestParam(value = "includeCategories", defaultValue = "false") boolean includeCategories)
 	{
-		return getEntityResponse(entityTypeId, untypedId, attributeFilter);
+		return getEntityResponse(entityTypeId, untypedId, attributeFilter, includeCategories);
 	}
 
 	private Map<String, Object> getEntityResponse(String entityTypeId, String untypedId,
-			AttributeFilter attributeFilter)
+			AttributeFilter attributeFilter, boolean includeCategories)
 	{
 		EntityType entityType = dataService.getEntityType(entityTypeId);
 		Object id = getTypedValue(untypedId, entityType.getIdAttribute());
@@ -189,7 +192,7 @@ public class RestControllerV2
 			throw new UnknownEntityException(entityTypeId + " [" + untypedId + "] not found");
 		}
 
-		return createEntityResponse(entity, fetch, true);
+		return createEntityResponse(entity, fetch, true, includeCategories);
 	}
 
 	@Transactional
@@ -234,16 +237,18 @@ public class RestControllerV2
 	 */
 	@GetMapping("/{entityTypeId}")
 	public EntityCollectionResponseV2 retrieveEntityCollection(@PathVariable("entityTypeId") String entityTypeId,
-			@Valid EntityCollectionRequestV2 request, HttpServletRequest httpRequest)
+			@Valid EntityCollectionRequestV2 request, HttpServletRequest httpRequest,
+			@RequestParam(value = "includeCategories", defaultValue = "false") boolean includeCategories)
 	{
-		return createEntityCollectionResponse(entityTypeId, request, httpRequest);
+		return createEntityCollectionResponse(entityTypeId, request, httpRequest, includeCategories);
 	}
 
 	@PostMapping(value = "/{entityTypeId}", params = "_method=GET")
 	public EntityCollectionResponseV2 retrieveEntityCollectionPost(@PathVariable("entityTypeId") String entityTypeId,
-			@Valid EntityCollectionRequestV2 request, HttpServletRequest httpRequest)
+			@Valid EntityCollectionRequestV2 request, HttpServletRequest httpRequest,
+			@RequestParam(value = "includeCategories", defaultValue = "false") boolean includeCategories)
 	{
-		return createEntityCollectionResponse(entityTypeId, request, httpRequest);
+		return createEntityCollectionResponse(entityTypeId, request, httpRequest, includeCategories);
 	}
 
 	/**
@@ -354,8 +359,8 @@ public class RestControllerV2
 		if (dataService.hasRepository(newFullName)) throw createDuplicateEntityException(newFullName);
 
 		// Permission
-		boolean readPermission = permissionService.hasPermissionOnEntityType(repositoryToCopyFrom.getName(),
-				Permission.READ);
+		boolean readPermission = permissionService.hasPermission(new EntityTypeIdentity(repositoryToCopyFrom.getName()),
+				EntityTypePermission.READ);
 		if (!readPermission) throw createNoReadPermissionOnEntityException(entityTypeId);
 
 		// Capabilities
@@ -633,7 +638,7 @@ public class RestControllerV2
 	}
 
 	private EntityCollectionResponseV2 createEntityCollectionResponse(String entityTypeId,
-			EntityCollectionRequestV2 request, HttpServletRequest httpRequest)
+			EntityCollectionRequestV2 request, HttpServletRequest httpRequest, boolean includeCategories)
 	{
 		EntityType meta = dataService.getEntityType(entityTypeId);
 
@@ -667,7 +672,7 @@ public class RestControllerV2
 		}
 		else
 		{
-			Long count = dataService.count(entityTypeId, q);
+			Long count = dataService.count(entityTypeId, new QueryImpl<>(q).setOffset(0).setPageSize(0));
 			Iterable<Entity> it;
 			if (count > 0 && q.getPageSize() > 0)
 			{
@@ -704,7 +709,7 @@ public class RestControllerV2
 			}
 
 			return new EntityCollectionResponseV2(pager, entities, fetch, BASE_URI + '/' + entityTypeId, meta,
-					permissionService, dataService, prevHref, nextHref);
+					permissionService, dataService, prevHref, nextHref, includeCategories);
 		}
 	}
 
@@ -725,18 +730,23 @@ public class RestControllerV2
 
 	private Map<String, Object> createEntityResponse(Entity entity, Fetch fetch, boolean includeMetaData)
 	{
+		return createEntityResponse(entity, fetch, includeMetaData, false);
+	}
+
+	private Map<String, Object> createEntityResponse(Entity entity, Fetch fetch, boolean includeMetaData, boolean includeCategories)
+	{
 		Map<String, Object> responseData = new LinkedHashMap<>();
 		if (includeMetaData)
 		{
-			createEntityTypeResponse(entity.getEntityType(), fetch, responseData);
+			createEntityTypeResponse(entity.getEntityType(), fetch, responseData, includeCategories);
 		}
 		createEntityValuesResponse(entity, fetch, responseData);
 		return responseData;
 	}
 
-	private void createEntityTypeResponse(EntityType entityType, Fetch fetch, Map<String, Object> responseData)
+	private void createEntityTypeResponse(EntityType entityType, Fetch fetch, Map<String, Object> responseData, boolean includeCategories)
 	{
-		responseData.put("_meta", new EntityTypeResponseV2(entityType, fetch, permissionService, dataService));
+		responseData.put("_meta", new EntityTypeResponseV2(entityType, fetch, permissionService, dataService, includeCategories));
 	}
 
 	private void createEntityValuesResponse(Entity entity, Fetch fetch, Map<String, Object> responseData)

@@ -4,10 +4,9 @@ import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
 import org.molgenis.core.ui.admin.user.UserAccountController;
 import org.molgenis.data.DataService;
-import org.molgenis.data.meta.model.*;
+import org.molgenis.data.meta.model.EntityType;
 import org.molgenis.data.plugin.model.PluginIdentity;
 import org.molgenis.data.plugin.model.PluginPermission;
-import org.molgenis.data.plugin.model.PluginPermissionUtils;
 import org.molgenis.data.security.EntityTypeIdentity;
 import org.molgenis.data.security.EntityTypePermission;
 import org.molgenis.data.security.EntityTypePermissionUtils;
@@ -31,7 +30,6 @@ import static org.molgenis.data.meta.model.PackageMetadata.PACKAGE;
 import static org.molgenis.data.meta.model.TagMetadata.TAG;
 import static org.molgenis.data.security.auth.GroupMetaData.GROUP;
 import static org.molgenis.data.security.auth.GroupMetaData.NAME;
-import static org.molgenis.data.security.owned.OwnedEntityType.OWNED;
 import static org.molgenis.security.account.AccountService.ALL_USER_GROUP;
 import static org.molgenis.security.acl.SidUtils.createSid;
 
@@ -54,12 +52,11 @@ public class PermissionRegistryImpl implements PermissionRegistry
 		Sid allUsersGroupSid = createSid(allUsersGroup);
 
 		ObjectIdentity pluginIdentity = new PluginIdentity(UserAccountController.ID);
-		Permission pluginPermissions = PluginPermissionUtils.getCumulativePermission(PluginPermission.WRITE);
-		mapBuilder.putAll(pluginIdentity, new Pair<>(pluginPermissions, allUsersGroupSid));
+		mapBuilder.putAll(pluginIdentity, new Pair<>(PluginPermission.READ, allUsersGroupSid));
 
 		dataService.findAll(ENTITY_TYPE_META_DATA,
 				Stream.of(ENTITY_TYPE_META_DATA, ATTRIBUTE_META_DATA, PACKAGE, TAG, LANGUAGE, L10N_STRING, FILE_META,
-						OWNED, DECORATOR_CONFIGURATION), EntityType.class).forEach(entityType ->
+						DECORATOR_CONFIGURATION), EntityType.class).forEach(entityType ->
 		{
 			ObjectIdentity entityTypeIdentity = new EntityTypeIdentity(entityType);
 			Permission entityTypePermissions = EntityTypePermissionUtils.getCumulativePermission(

@@ -25,7 +25,6 @@ import static org.molgenis.data.file.model.FileMetaMetaData.FILE_META;
 import static org.molgenis.data.meta.model.AttributeMetadata.ATTRIBUTE_META_DATA;
 import static org.molgenis.data.meta.model.EntityTypeMetadata.ENTITY_TYPE_META_DATA;
 import static org.molgenis.data.meta.model.PackageMetadata.PACKAGE;
-import static org.molgenis.data.security.owned.OwnedEntityType.OWNED;
 
 public class RestControllerV2IT
 {
@@ -83,12 +82,31 @@ public class RestControllerV2IT
 						  .put(ENTITY_TYPE_META_DATA, WRITE)
 						  .put(ATTRIBUTE_META_DATA, WRITE)
 						  .put(FILE_META, READ)
-						  .put(OWNED, READ)
 						  .put(UserMetaData.USER, COUNT);
 		testEntities.forEach(entity -> permissionsBuilder.put(entity, WRITE));
 		setGrantedRepositoryPermissions(adminToken, testUserId, permissionsBuilder.build());
 
 		testUserToken = login(testUserName, REST_TEST_USER_PASSWORD);
+	}
+
+	@Test
+	public void testApiCorsPreflightRequest()
+	{
+		given().log()
+			   .all()
+			   .header("Access-Control-Request-Method", "DELETE ")
+			   .header("Access-Control-Request-Headers", "x-molgenis-token")
+			   .header("Origin", "https://foo.bar.org")
+			   .when()
+			   .options(API_V2 + "version")
+			   .then()
+			   .statusCode(OKE)
+			   .log()
+			   .all()
+			   .header("Access-Control-Allow-Origin", "*")
+			   .header("Access-Control-Allow-Methods", "DELETE")
+			   .header("Access-Control-Allow-Headers", "x-molgenis-token")
+			   .header("Access-Control-Max-Age", "1800");
 	}
 
 	@Test

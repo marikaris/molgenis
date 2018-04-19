@@ -4,7 +4,7 @@ import org.molgenis.data.DataService;
 import org.molgenis.data.Fetch;
 import org.molgenis.data.meta.model.EntityType;
 import org.molgenis.data.rest.EntityPager;
-import org.molgenis.security.core.PermissionService;
+import org.molgenis.security.core.UserPermissionEvaluator;
 
 import java.util.List;
 import java.util.Map;
@@ -35,11 +35,13 @@ class EntityCollectionResponseV2
 	}
 
 	public EntityCollectionResponseV2(EntityPager entityPager, List<Map<String, Object>> items, Fetch fetch,
-			String href, EntityType meta, PermissionService permissionService, DataService dataService, String prevHref,
-			String nextHref)
+			String href, EntityType meta, UserPermissionEvaluator permissionService, DataService dataService,
+			String prevHref,
+			String nextHref,
+			boolean includeCategories)
 	{
 		this.href = href;
-		this.meta = new EntityTypeResponseV2(meta, fetch, permissionService, dataService);
+		this.meta = new EntityTypeResponseV2(meta, fetch, permissionService, dataService, includeCategories);
 		this.start = entityPager.getStart();
 		this.num = entityPager.getNum();
 		this.total = entityPager.getTotal();

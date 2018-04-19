@@ -58,14 +58,30 @@
               "auto": false,
               "nillable": false,
               "readOnly": true,
-              "labelAttribute": true,
+              "labelAttribute": false,
               "unique": true,
               "visible": true,
               "lookupAttribute": true,
               "isAggregatable": false
+            },
+            {
+              "href": "/api/v2/refEntity/meta/value",
+              "fieldType": "STRING",
+              "name": "value",
+              "label": "value",
+              "attributes": [],
+              "maxLength": 255,
+              "auto": false,
+              "nillable": true,
+              "readOnly": false,
+              "labelAttribute": true,
+              "unique": false,
+              "visible": true,
+              "lookupAttribute": false,
+              "isAggregatable": false
             }
           ],
-          "labelAttribute": "id",
+          "labelAttribute": "value",
           "idAttribute": "id",
           "lookupAttributes": [
             "id"
@@ -105,14 +121,30 @@
               "auto": false,
               "nillable": false,
               "readOnly": true,
-              "labelAttribute": true,
+              "labelAttribute": false,
               "unique": true,
               "visible": true,
               "lookupAttribute": true,
               "isAggregatable": false
+            },
+            {
+              "href": "/api/v2/refEntity/meta/value",
+              "fieldType": "STRING",
+              "name": "value",
+              "label": "value",
+              "attributes": [],
+              "maxLength": 255,
+              "auto": false,
+              "nillable": true,
+              "readOnly": false,
+              "labelAttribute": true,
+              "unique": false,
+              "visible": true,
+              "lookupAttribute": false,
+              "isAggregatable": false
             }
           ],
-          "labelAttribute": "id",
+          "labelAttribute": "value",
           "idAttribute": "id",
           "lookupAttributes": [
             "id"
@@ -143,6 +175,69 @@
             "label": "compound_attr0",
             "attributes": [],
             "maxLength": 255,
+            "auto": false,
+            "nillable": false,
+            "readOnly": false,
+            "labelAttribute": false,
+            "unique": false,
+            "visible": true,
+            "lookupAttribute": false,
+            "isAggregatable": false
+          },
+          {
+            "href": "/api/v2/entity/meta/compound_categorical",
+            "fieldType": "CATEGORICAL",
+            "name": "compound_categorical",
+            "label": "compound_categorical",
+            "attributes": [],
+            "refEntity": {
+              "href": "/api/v2/refEntity",
+              "hrefCollection": "/api/v2/refEntity",
+              "name": "refEntity",
+              "label": "refEntity",
+              "attributes": [
+                {
+                  "href": "/api/v2/refEntity/meta/id",
+                  "fieldType": "STRING",
+                  "name": "id",
+                  "label": "id",
+                  "attributes": [],
+                  "maxLength": 255,
+                  "auto": false,
+                  "nillable": false,
+                  "readOnly": true,
+                  "labelAttribute": false,
+                  "unique": true,
+                  "visible": true,
+                  "lookupAttribute": true,
+                  "isAggregatable": false
+                },
+                {
+                  "href": "/api/v2/refEntity/meta/value",
+                  "fieldType": "STRING",
+                  "name": "value",
+                  "label": "value",
+                  "attributes": [],
+                  "maxLength": 255,
+                  "auto": false,
+                  "nillable": true,
+                  "readOnly": false,
+                  "labelAttribute": true,
+                  "unique": false,
+                  "visible": true,
+                  "lookupAttribute": false,
+                  "isAggregatable": false
+                }
+              ],
+              "labelAttribute": "value",
+              "idAttribute": "id",
+              "lookupAttributes": [
+                "id"
+              ],
+              "isAbstract": false,
+              "writable": false,
+              "languageCode": "en"
+            },
             "auto": false,
             "nillable": false,
             "readOnly": false,
@@ -392,14 +487,30 @@
               "auto": false,
               "nillable": false,
               "readOnly": true,
-              "labelAttribute": true,
+              "labelAttribute": false,
               "unique": true,
               "visible": true,
               "lookupAttribute": true,
               "isAggregatable": false
+            },
+            {
+              "href": "/api/v2/refEntity/meta/value",
+              "fieldType": "STRING",
+              "name": "value",
+              "label": "value",
+              "attributes": [],
+              "maxLength": 255,
+              "auto": false,
+              "nillable": true,
+              "readOnly": false,
+              "labelAttribute": true,
+              "unique": false,
+              "visible": true,
+              "lookupAttribute": false,
+              "isAggregatable": false
             }
           ],
-          "labelAttribute": "id",
+          "labelAttribute": "value",
           "idAttribute": "id",
           "lookupAttributes": [
             "id"
@@ -487,14 +598,30 @@
               "auto": false,
               "nillable": false,
               "readOnly": true,
-              "labelAttribute": true,
+              "labelAttribute": false,
               "unique": true,
               "visible": true,
               "lookupAttribute": true,
               "isAggregatable": false
+            },
+            {
+              "href": "/api/v2/refEntity/meta/value",
+              "fieldType": "STRING",
+              "name": "value",
+              "label": "value",
+              "attributes": [],
+              "maxLength": 255,
+              "auto": false,
+              "nillable": true,
+              "readOnly": false,
+              "labelAttribute": true,
+              "unique": false,
+              "visible": true,
+              "lookupAttribute": false,
+              "isAggregatable": false
             }
           ],
-          "labelAttribute": "id",
+          "labelAttribute": "value",
           "idAttribute": "id",
           "lookupAttributes": [
             "id"
@@ -549,14 +676,30 @@
               "auto": false,
               "nillable": false,
               "readOnly": true,
-              "labelAttribute": true,
+              "labelAttribute": false,
               "unique": true,
               "visible": true,
               "lookupAttribute": true,
               "isAggregatable": false
+            },
+            {
+              "href": "/api/v2/refEntity/meta/value",
+              "fieldType": "STRING",
+              "name": "value",
+              "label": "value",
+              "attributes": [],
+              "maxLength": 255,
+              "auto": false,
+              "nillable": true,
+              "readOnly": false,
+              "labelAttribute": true,
+              "unique": false,
+              "visible": true,
+              "lookupAttribute": false,
+              "isAggregatable": false
             }
           ],
-          "labelAttribute": "id",
+          "labelAttribute": "value",
           "idAttribute": "id",
           "lookupAttributes": [
             "id"
@@ -596,14 +739,30 @@
               "auto": false,
               "nillable": false,
               "readOnly": true,
-              "labelAttribute": true,
+              "labelAttribute": false,
               "unique": true,
               "visible": true,
               "lookupAttribute": true,
               "isAggregatable": false
+            },
+            {
+              "href": "/api/v2/refEntity/meta/value",
+              "fieldType": "STRING",
+              "name": "value",
+              "label": "value",
+              "attributes": [],
+              "maxLength": 255,
+              "auto": false,
+              "nillable": true,
+              "readOnly": false,
+              "labelAttribute": true,
+              "unique": false,
+              "visible": true,
+              "lookupAttribute": false,
+              "isAggregatable": false
             }
           ],
-          "labelAttribute": "id",
+          "labelAttribute": "value",
           "idAttribute": "id",
           "lookupAttributes": [
             "id"
@@ -787,14 +946,30 @@
               "auto": false,
               "nillable": false,
               "readOnly": true,
-              "labelAttribute": true,
+              "labelAttribute": false,
               "unique": true,
               "visible": true,
               "lookupAttribute": true,
               "isAggregatable": false
+            },
+            {
+              "href": "/api/v2/refEntity/meta/value",
+              "fieldType": "STRING",
+              "name": "value",
+              "label": "value",
+              "attributes": [],
+              "maxLength": 255,
+              "auto": false,
+              "nillable": true,
+              "readOnly": false,
+              "labelAttribute": true,
+              "unique": false,
+              "visible": true,
+              "lookupAttribute": false,
+              "isAggregatable": false
             }
           ],
-          "labelAttribute": "id",
+          "labelAttribute": "value",
           "idAttribute": "id",
           "lookupAttributes": [
             "id"
@@ -882,14 +1057,30 @@
               "auto": false,
               "nillable": false,
               "readOnly": true,
-              "labelAttribute": true,
+              "labelAttribute": false,
               "unique": true,
               "visible": true,
               "lookupAttribute": true,
               "isAggregatable": false
+            },
+            {
+              "href": "/api/v2/refEntity/meta/value",
+              "fieldType": "STRING",
+              "name": "value",
+              "label": "value",
+              "attributes": [],
+              "maxLength": 255,
+              "auto": false,
+              "nillable": true,
+              "readOnly": false,
+              "labelAttribute": true,
+              "unique": false,
+              "visible": true,
+              "lookupAttribute": false,
+              "isAggregatable": false
             }
           ],
-          "labelAttribute": "id",
+          "labelAttribute": "value",
           "idAttribute": "id",
           "lookupAttributes": [
             "id"
@@ -930,8 +1121,8 @@
       "id": "ref0"
     },
     {
-      "_href": "/api/v2/refEntity/ref0",
-      "id": "ref0"
+      "_href": "/api/v2/refEntity/ref1",
+      "id": "ref1"
     }
   ],
   "compound_attr0": "compoundAttr0Str",
@@ -951,8 +1142,8 @@
       "id": "ref0"
     },
     {
-      "_href": "/api/v2/refEntity/ref0",
-      "id": "ref0"
+      "_href": "/api/v2/refEntity/ref1",
+      "id": "ref1"
     }
   ],
   "script": "print \"Hello world\"",

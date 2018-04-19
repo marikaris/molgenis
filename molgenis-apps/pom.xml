@@ -4,7 +4,7 @@
     <parent>
         <artifactId>molgenis</artifactId>
         <groupId>org.molgenis</groupId>
-        <version>6.1.0-SNAPSHOT</version>
+        <version>7.0.0-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -53,7 +53,6 @@
         <dependency>
             <groupId>net.lingala.zip4j</groupId>
             <artifactId>zip4j</artifactId>
-            <version>1.3.2</version>
         </dependency>
         <dependency>
             <groupId>javax.servlet</groupId>

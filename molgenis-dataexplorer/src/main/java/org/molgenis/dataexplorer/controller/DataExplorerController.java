@@ -3,13 +3,14 @@ package org.molgenis.dataexplorer.controller;
 import com.google.gson.Gson;
 import freemarker.core.ParseException;
 import org.apache.commons.lang3.StringUtils;
-import org.json.JSONObject;
 import org.molgenis.core.ui.menu.MenuReaderService;
 import org.molgenis.data.*;
 import org.molgenis.data.annotation.web.meta.AnnotationJobExecutionMetaData;
 import org.molgenis.data.meta.model.AttributeFactory;
 import org.molgenis.data.meta.model.EntityType;
 import org.molgenis.data.meta.model.Package;
+import org.molgenis.data.security.EntityTypeIdentity;
+import org.molgenis.data.security.EntityTypePermission;
 import org.molgenis.data.support.EntityTypeUtils;
 import org.molgenis.data.support.QueryImpl;
 import org.molgenis.dataexplorer.controller.DataRequest.DownloadType;
@@ -20,7 +21,7 @@ import org.molgenis.genomebrowser.GenomeBrowserTrack;
 import org.molgenis.genomebrowser.service.GenomeBrowserService;
 import org.molgenis.jobs.model.JobExecutionMetaData;
 import org.molgenis.security.core.Permission;
-import org.molgenis.security.core.PermissionService;
+import org.molgenis.security.core.UserPermissionEvaluator;
 import org.molgenis.security.core.utils.SecurityUtils;
 import org.molgenis.settings.AppSettings;
 import org.molgenis.util.UnexpectedEnumException;
@@ -79,7 +80,7 @@ public class DataExplorerController extends PluginController
 	private DataService dataService;
 
 	@Autowired
-	private PermissionService permissionService;
+	private UserPermissionEvaluator permissionService;
 
 	@Autowired
 	private FreeMarkerConfigurer freemarkerConfigurer;
@@ -167,7 +168,8 @@ public class DataExplorerController extends PluginController
 			StringBuilder message)
 	{
 		boolean entityExists = dataService.hasRepository(selectedEntityName);
-		boolean hasEntityPermission = permissionService.hasPermissionOnEntityType(selectedEntityName, Permission.COUNT);
+		boolean hasEntityPermission = permissionService.hasPermission(new EntityTypeIdentity(selectedEntityName),
+				EntityTypePermission.COUNT);
 
 		if (!(entityExists && hasEntityPermission))
 		{
@@ -197,7 +199,7 @@ public class DataExplorerController extends PluginController
 			case MOD_DATA:
 				selectedEntityType = dataService.getMeta().getEntityTypeById(entityTypeId);
 				entityTracks = genomeBrowserService.getGenomeBrowserTracks(selectedEntityType);
-				model.addAttribute("genomeTracks", getTracksJson(entityTracks));
+				model.addAttribute("genomeTracks", genomeBrowserService.getTracksJson(entityTracks));
 				//if multiple tracks are available we assume chrom and pos attribute are the same
 				if (!entityTracks.isEmpty())
 				{
@@ -213,7 +215,7 @@ public class DataExplorerController extends PluginController
 				//TODO: figure out if we need to know pos and chrom attrs here
 				selectedEntityType = dataService.getMeta().getEntityTypeById(entityTypeId);
 				entityTracks = genomeBrowserService.getGenomeBrowserTracks(selectedEntityType);
-				model.addAttribute("genomeTracks", getTracksJson(entityTracks));
+				model.addAttribute("genomeTracks", genomeBrowserService.getTracksJson(entityTracks));
 				model.addAttribute("showDirectoryButton", directoryController.showDirectoryButton(entityTypeId));
 				model.addAttribute("NegotiatorEnabled", directoryController.showDirectoryButton(entityTypeId));
 
@@ -223,7 +225,8 @@ public class DataExplorerController extends PluginController
 			case MOD_ANNOTATORS:
 				// throw exception rather than disable the tab, users can act on the message. Hiding the tab is less
 				// self-explanatory
-				if (!permissionService.hasPermissionOnEntityType(entityTypeId, Permission.WRITEMETA))
+				if (!permissionService.hasPermission(new EntityTypeIdentity(entityTypeId),
+						EntityTypePermission.WRITEMETA))
 				{
 					throw new MolgenisDataAccessException(
 							"No " + Permission.WRITEMETA + " permission on entity [" + entityTypeId
@@ -244,8 +247,8 @@ public class DataExplorerController extends PluginController
 	@ResponseBody
 	public boolean showCopy(@RequestParam("entity") String entityTypeId)
 	{
-		return permissionService.hasPermissionOnEntityType(entityTypeId, READ) && dataService.getCapabilities(
-				entityTypeId).contains(RepositoryCapability.WRITABLE);
+		return permissionService.hasPermission(new EntityTypeIdentity(entityTypeId), EntityTypePermission.READ)
+				&& dataService.getCapabilities(entityTypeId).contains(RepositoryCapability.WRITABLE);
 	}
 
 	/**
@@ -267,9 +270,11 @@ public class DataExplorerController extends PluginController
 
 		// set data explorer permission
 		Permission pluginPermission = null;
-		if (permissionService.hasPermissionOnEntityType(entityTypeId, WRITE)) pluginPermission = WRITE;
-		else if (permissionService.hasPermissionOnEntityType(entityTypeId, READ)) pluginPermission = READ;
-		else if (permissionService.hasPermissionOnEntityType(entityTypeId, Permission.COUNT))
+		if (permissionService.hasPermission(new EntityTypeIdentity(entityTypeId), EntityTypePermission.WRITE))
+			pluginPermission = WRITE;
+		else if (permissionService.hasPermission(new EntityTypeIdentity(entityTypeId), EntityTypePermission.READ))
+			pluginPermission = READ;
+		else if (permissionService.hasPermission(new EntityTypeIdentity(entityTypeId), EntityTypePermission.COUNT))
 			pluginPermission = Permission.COUNT;
 
 		ModulesConfigResponse modulesConfig = new ModulesConfigResponse();
@@ -348,20 +353,6 @@ public class DataExplorerController extends PluginController
 			pack = pack.getParent();
 			getNavigatorLinks(result, pack, navigatorPath);
 		}
-	}
-
-	/**
-	 * Get readable genome entities
-	 */
-	private List<JSONObject> getTracksJson(Map<String, GenomeBrowserTrack> entityTracks)
-	{
-		Map<String, GenomeBrowserTrack> allTracks = new HashMap<>();
-		allTracks.putAll(entityTracks);
-		for (GenomeBrowserTrack track : entityTracks.values())
-		{
-			allTracks.putAll(genomeBrowserService.getReferenceTracks(track));
-		}
-		return allTracks.values().stream().map(track -> track.toTrackJson()).collect(Collectors.toList());
 	}
 
 	@PostMapping("/download")
